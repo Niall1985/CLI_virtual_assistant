@@ -5,21 +5,21 @@ import pyttsx3
 import speech_recognition as sr
 import webbrowser
 import spacy
-from datetime import datetime
+from datetime import datetime, timedelta
 import threading
 import getpass
 import time
 from AppOpener import open, close
+from plyer import notification  # Importing plyer for desktop notifications
 
-# Load environment variables
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
 
-# Configure and initialize the generative model
+# Configuration and initialization of the the gemini model
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel(model_name="gemini-pro")
 
-# Load English language model for spaCy
+# English language model for spaCy
 nlp = spacy.load("en_core_web_sm")
 
 def speech_engine_settings():
@@ -32,9 +32,9 @@ def speech_engine_settings():
 def set_reminder(interval, message):
     def reminder():
         time.sleep(interval)
-        lucy = speech_engine_settings()
-        lucy.say(message)
-        lucy.runAndWait()
+        notification_title = "Reminder"
+        notification_message = message
+        notification.notify(title=notification_title, message=notification_message, timeout=10)
 
     reminder_thread = threading.Thread(target=reminder)
     reminder_thread.start()
@@ -47,6 +47,8 @@ def get_current_date_time():
 
 def remind_drinking_water():
     set_reminder(10, "This is your reminder to drink water")
+    # Set another reminder after 30 minutes
+    threading.Timer(30 * 60, remind_drinking_water).start()
 
 def recognize_speech(prompt="Listening..."):
     r = sr.Recognizer()
@@ -67,17 +69,13 @@ def recognize_speech(prompt="Listening..."):
 def execute_command(command):
     keywords = {
         "reminder": set_reminder_function,
-        "drink water": remind_drinking_water_function,
+        "remind me to drink water": remind_drinking_water_function,
         "date": get_current_date_time_function,
         "time": get_current_date_time_function,
         "open": open_application_function,
         "close": close_application_function,
         "google": google_search_function,
-        "provide me some information": gemini_function,
-        "provide me some content": gemini_function,
-        "who": gemini_function,
-        "what": gemini_function,
-        "how": gemini_function,
+        "ask gemini to": gemini_function,
         "exit": exit_function
     }
     
@@ -137,8 +135,9 @@ def google_search_function(command):
     return f"Opening Google search for: {search_query}"
 
 def gemini_function(command):
-    user = command.replace("information", "").strip()
+    user = command.replace("ask gemini to", "").strip()
     response = model.generate_content(user)
+    print("Gemini Response:", response.text)  
     return response.text
 
 def exit_function(command):
@@ -158,11 +157,11 @@ def main():
                 
                 auth_passkey = getpass.getpass("Enter your passkey: ")
                 if auth_passkey == os.getenv('passkey'):
-                    lucy.say("Hello Niall, how may I assist you today?")
+                    lucy.say("Authorization successful, Hello Niall, how may I assist you today?")
                     lucy.runAndWait()
                     
                     while True:
-                        lucy.say("Please tell me what you want to do. To exit the program say 'exit'.")
+                        lucy.say("Please tell me what you want me to do. To exit the program say 'exit'.")
                         lucy.runAndWait()
                         command = recognize_speech("Listening for command...")
                         if command:
