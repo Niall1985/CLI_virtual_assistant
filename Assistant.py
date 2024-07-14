@@ -8,7 +8,9 @@ import time
 from datetime import datetime
 import threading
 import webbrowser
+import spacy
 
+nlp = spacy.load("en_core_web_sm")
 def speech_engine_settings():
     lucy = pyttsx3.init()
     lucy.setProperty('rate', 130)
@@ -60,6 +62,7 @@ def execute_command(command):
         "open": open_application_function,
         "close": close_application_function,
         "google": google_search_function,
+        # "information": gemini_function,
         "exit": exit_function
     }
     
@@ -118,12 +121,22 @@ def google_search_function(command):
     webbrowser.open(google_search_url)
     return f"Opening Google search for: {search_query}"
 
+# def gemini_function(command):
+#     cmd = nlp(command)
+#     topics = [chunk.text for chunk in cmd.noun_chunks]
+#     if topics:
+#         topic = topics[0]
+#         return f"Fetching information about {topic}"
+#     else:
+#         return "I couldn't understand the topic you're interested in. Please try again."
+
 def exit_function(command):
     return "exit"
 
 def main():
     load_dotenv()
     passkey = os.getenv('passkey')
+    # api_key = os.getenv('gemini_api_key')
 
     while True:
         user_command = recognize_speech()
