@@ -95,6 +95,9 @@ def execute_command(command):
         "google": google_search_function,
         "ask gemini to": gemini_function,
         "weather": weather_function,
+        "open a file": open_file_function,
+        "close a file": close_file_function,
+        "delete a file": delete_file_function,
         "exit": exit_function
     }
     
