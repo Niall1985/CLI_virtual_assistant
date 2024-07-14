@@ -10,12 +10,14 @@ import threading
 import getpass
 import time
 from AppOpener import open, close
-from plyer import notification  # Importing plyer for desktop notifications
+from plyer import notification  
+import requests
 
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
+weather_api = os.getenv('open_weather_api')
 
-# Configuration and initialization of the the gemini model
+# Configuration and initialization of the gemini model
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel(model_name="gemini-pro")
 
@@ -45,10 +47,20 @@ def get_current_date_time():
     current_date = now.strftime("%Y-%m-%d")
     return f"The current date is {current_date} and the time is {current_time}"
 
+
 def remind_drinking_water():
-    set_reminder(10, "This is your reminder to drink water")
-    # Set another reminder after 30 minutes
-    threading.Timer(30 * 60, remind_drinking_water).start()
+    def send_notification():
+        while True:
+            notification.notify(
+                title="Reminder",
+                message="This is your reminder to drink water",
+                timeout=5
+            )
+            time.sleep(1800) 
+
+    reminder_thread = threading.Thread(target=send_notification)
+    reminder_thread.daemon = True
+    reminder_thread.start()
 
 def recognize_speech(prompt="Listening..."):
     r = sr.Recognizer()
@@ -66,16 +78,23 @@ def recognize_speech(prompt="Listening..."):
         print(f"An error occurred: {e}")
     return None
 
+def extract_city(command):
+    doc = nlp(command)
+    for ent in doc.ents:
+        if ent.label_ == "GPE": 
+            return ent.text
+    return None
+
 def execute_command(command):
     keywords = {
         "reminder": set_reminder_function,
-        "remind me to drink water": remind_drinking_water_function,
         "date": get_current_date_time_function,
         "time": get_current_date_time_function,
         "open": open_application_function,
         "close": close_application_function,
         "google": google_search_function,
         "ask gemini to": gemini_function,
+        "weather": weather_function,
         "exit": exit_function
     }
     
@@ -105,9 +124,7 @@ def set_reminder_function(command):
     except ValueError:
         return "I couldn't understand the time interval. Please try again."
 
-def remind_drinking_water_function(command):
-    remind_drinking_water()
-    return "Reminder to drink water set for 10 seconds."
+
 
 def get_current_date_time_function(command):
     return get_current_date_time()
@@ -137,13 +154,37 @@ def google_search_function(command):
 def gemini_function(command):
     user = command.replace("ask gemini to", "").strip()
     response = model.generate_content(user)
-    print("Gemini Response:", response.text)  
-    return response.text
+    formatted_response = response.strip("*", "")
+    print("Gemini Response:", formatted_response.text)  
+    return formatted_response.text
+
+def get_weather(city):
+    weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api}"
+    response = requests.get(weather_url)
+    data = response.json()
+    if data['cod'] == 200:
+        main = data['main']
+        weather = data['weather'][0]
+        temperature = main['temp']
+        temp_in_celcuis = temperature-273.15
+        description = weather['description']
+        return f"The weather in {city} is {description} with a temperature of {temp_in_celcuis}°C."
+    else:
+        return "City not found."
+
+def weather_function(command):
+    city = extract_city(command)
+    print(city)
+    if city:
+        return get_weather(city)
+    else:
+        return "I couldn't determine the city for the weather request."
 
 def exit_function(command):
     return "exit"
 
 def main():
+    remind_drinking_water()
     while True:
         user_command = recognize_speech("Listening...")
 

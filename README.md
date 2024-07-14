@@ -1,2 +1,2 @@
-# CLI_voice_assistant
-A simple voice assistant which can be accessed from your command line.
+# LUCY: Your Personalized CLI_virtual_assistant
+Lucy is a simple virtual assistant which can be accessed from your command line.
