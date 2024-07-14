@@ -4,18 +4,41 @@ import speech_recognition as sr
 from dotenv import load_dotenv
 import os
 import getpass
+import time
+from datetime import datetime
+import threading
+import webbrowser
 
 def speech_engine_settings():
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 130)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)  # Assuming index 1 is the desired voice
-    return engine
+    lucy = pyttsx3.init()
+    lucy.setProperty('rate', 130)
+    voices = lucy.getProperty('voices')
+    lucy.setProperty('voice', voices[1].id)
+    return lucy
 
-def recognize_speech():
+def set_reminder(interval, message):
+    def reminder():
+        time.sleep(interval)
+        lucy = speech_engine_settings()
+        lucy.say(message)
+        lucy.runAndWait()
+
+    reminder_thread = threading.Thread(target=reminder)
+    reminder_thread.start()
+
+def get_current_date_time():
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    current_date = now.strftime("%Y-%m-%d")
+    return f"The current date is {current_date} and the time is {current_time}"
+
+def remind_drinking_water():
+    set_reminder(10, "This is your reminder to drink water")
+
+def recognize_speech(prompt="Listening..."):
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        print("Listening...")
+        print(prompt)
         r.adjust_for_ambient_noise(source)
         audio = r.listen(source)
     try:
@@ -28,29 +51,118 @@ def recognize_speech():
         print(f"An error occurred: {e}")
     return None
 
+def execute_command(command):
+    keywords = {
+        "reminder": set_reminder_function,
+        "drink water": remind_drinking_water_function,
+        "date": get_current_date_time_function,
+        "time": get_current_date_time_function,
+        "open": open_application_function,
+        "close": close_application_function,
+        "google": google_search_function,
+        "exit": exit_function
+    }
+    
+    for keyword, function in keywords.items():
+        if keyword in command:
+            return function(command)
+    return "I'm sorry, I didn't understand that command."
+
+def set_reminder_function(command):
+    lucy = speech_engine_settings()
+    lucy.say("What is the reminder message?")
+    lucy.runAndWait()
+    reminder_message = recognize_speech("Listening for reminder message...")
+    if reminder_message is None:
+        return "I couldn't understand the reminder message. Please try again."
+    
+    lucy.say("In how many seconds should I remind you?")
+    lucy.runAndWait()
+    interval = recognize_speech("Listening for time interval...")
+    if interval is None:
+        return "I couldn't understand the time interval. Please try again."
+
+    try:
+        interval = int(interval)
+        set_reminder(interval, reminder_message)
+        return f"Reminder set for {interval} seconds."
+    except ValueError:
+        return "I couldn't understand the time interval. Please try again."
+
+def remind_drinking_water_function(command):
+    remind_drinking_water()
+    return "Reminder to drink water set for 10 seconds."
+
+def get_current_date_time_function(command):
+    return get_current_date_time()
+
+def open_application_function(command):
+    application_name = command.replace("open", "").strip()
+    try:
+        open(application_name)
+        return f"Opening {application_name}."
+    except Exception as e:
+        return f"Could not open {application_name}. Error: {e}"
+    
+def close_application_function(command):
+    application_name = command.replace("close", "").strip()
+    try:
+        close(application_name)
+        return f"Closing {application_name}."
+    except Exception as e:
+        return f"Could not close {application_name}. Error: {e}"
+
+def google_search_function(command):
+    search_query = command.replace("google", "").strip()
+    google_search_url = f"https://www.google.com/search?q={search_query.replace(' ', '+')}"
+    webbrowser.open(google_search_url)
+    return f"Opening Google search for: {search_query}"
+
+def exit_function(command):
+    return "exit"
+
 def main():
     load_dotenv()
     passkey = os.getenv('passkey')
 
-    user_command = recognize_speech()
-    if user_command:
-        print("What you said:", user_command)
-        
-        if "lucy" in user_command:
-            lucy = speech_engine_settings()
-            lucy.say("Hello, my name is Lucy, please enter your passkey for authorization")
-            lucy.runAndWait()
+    while True:
+        user_command = recognize_speech()
+        if user_command:
+            print("What you said:", user_command)
             
-            auth_passkey = getpass.getpass("Enter your passkey: ")  
-            if auth_passkey == passkey:
-                lucy.say("Hello Niall, how may I assist you today?")
+            if "lucy" in user_command:
+                lucy = speech_engine_settings()
+                lucy.say("Hello, my name is Lucy, please enter your passkey for authorization")
+                lucy.runAndWait()
+                
+                auth_passkey = getpass.getpass("Enter your passkey: ")
+                if auth_passkey == passkey:
+                    lucy.say("Hello Niall, how may I assist you today?")
+                    lucy.runAndWait()
+                    
+                    while True:
+                        lucy.say("Please tell me what you want to do. To exit the program say 'exit'.")
+                        lucy.runAndWait()
+                        command = recognize_speech("Listening for command...")
+                        if command:
+                            result = execute_command(command)
+                            if result == "exit":
+                                lucy.say("Exiting the program. Goodbye Niall.")
+                                lucy.runAndWait()
+                                return
+                            else:
+                                lucy.say(result)
+                                lucy.runAndWait()
+                        else:
+                            lucy.say("I didn't catch that. Could you please repeat?")
+                            lucy.runAndWait()
+                else:
+                    lucy.say("You have entered an invalid passkey, Authorization failed.")
+                    lucy.runAndWait()
             else:
-                lucy.say("You have entered an invalid passkey, Authorization failed")
-            lucy.runAndWait()
+                print("Error: 'lucy' not found in the command")
         else:
-            print("Error: 'lucy' not found in the command")
-    else:
-        print("Error: Could not process the command")
+            print("Error: Could not process the command")
 
 if __name__ == "__main__":
     main()
