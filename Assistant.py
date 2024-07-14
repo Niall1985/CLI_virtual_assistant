@@ -1,16 +1,27 @@
-from AppOpener import open, close
-import pyttsx3
-import speech_recognition as sr
+import google.generativeai as genai
 from dotenv import load_dotenv
 import os
-import getpass
-import time
-from datetime import datetime
-import threading
+import pyttsx3
+import speech_recognition as sr
 import webbrowser
 import spacy
+from datetime import datetime
+import threading
+import getpass
+import time
+from AppOpener import open, close
 
+# Load environment variables
+load_dotenv()
+api_key = os.getenv('gemini_api_key')
+
+# Configure and initialize the generative model
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel(model_name="gemini-pro")
+
+# Load English language model for spaCy
 nlp = spacy.load("en_core_web_sm")
+
 def speech_engine_settings():
     lucy = pyttsx3.init()
     lucy.setProperty('rate', 130)
@@ -62,7 +73,11 @@ def execute_command(command):
         "open": open_application_function,
         "close": close_application_function,
         "google": google_search_function,
-        # "information": gemini_function,
+        "provide me some information": gemini_function,
+        "provide me some content": gemini_function,
+        "who": gemini_function,
+        "what": gemini_function,
+        "how": gemini_function,
         "exit": exit_function
     }
     
@@ -121,25 +136,18 @@ def google_search_function(command):
     webbrowser.open(google_search_url)
     return f"Opening Google search for: {search_query}"
 
-# def gemini_function(command):
-#     cmd = nlp(command)
-#     topics = [chunk.text for chunk in cmd.noun_chunks]
-#     if topics:
-#         topic = topics[0]
-#         return f"Fetching information about {topic}"
-#     else:
-#         return "I couldn't understand the topic you're interested in. Please try again."
+def gemini_function(command):
+    user = command.replace("information", "").strip()
+    response = model.generate_content(user)
+    return response.text
 
 def exit_function(command):
     return "exit"
 
 def main():
-    load_dotenv()
-    passkey = os.getenv('passkey')
-    # api_key = os.getenv('gemini_api_key')
-
     while True:
-        user_command = recognize_speech()
+        user_command = recognize_speech("Listening...")
+
         if user_command:
             print("What you said:", user_command)
             
@@ -149,7 +157,7 @@ def main():
                 lucy.runAndWait()
                 
                 auth_passkey = getpass.getpass("Enter your passkey: ")
-                if auth_passkey == passkey:
+                if auth_passkey == os.getenv('passkey'):
                     lucy.say("Hello Niall, how may I assist you today?")
                     lucy.runAndWait()
                     
