@@ -180,6 +180,49 @@ def weather_function(command):
     else:
         return "I couldn't determine the city for the weather request."
 
+def open_file_function(command):
+    lucy = speech_engine_settings()
+    lucy.say("Please enter the file path you want to open:")
+    lucy.runAndWait()
+    file_path = input("Enter the file path: ").strip()
+    try:
+        if os.path.isfile(file_path):
+            os.startfile(file_path)
+            return f"Opening file: {file_path}"
+        else:
+            return f"File not found: {file_path}"
+    except Exception as e:
+        return f"Could not open file. Error: {e}"
+
+def close_file_function(command):
+    lucy = speech_engine_settings()
+    lucy.say("Please enter the file path you want to close:")
+    lucy.runAndWait()
+    file_path = input("Enter the file path: ").strip()
+    try:
+        if os.path.isfile(file_path):
+            os.close(file_path)
+            return f"Closing file: {file_path}"
+        else:
+            return f"File not found: {file_path}"
+    except Exception as e:
+        return f"Could not close file. Error: {e}"
+
+def delete_file_function(command):
+    lucy = speech_engine_settings()
+    lucy.say("Please enter the file path you want to delete:")
+    lucy.runAndWait()
+    file_path = input("Enter the file path: ").strip()
+    try:
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            return f"Deleting file: {file_path}"
+        else:
+            return f"File not found: {file_path}"
+    except Exception as e:
+        return f"Could not delete file. Error: {e}"
+
+
 def exit_function(command):
     return "exit"
 
