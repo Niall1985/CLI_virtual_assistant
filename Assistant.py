@@ -12,7 +12,7 @@ import time
 from AppOpener import open, close
 from plyer import notification  
 import requests
-
+#import pywhatkit
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
 weather_api = os.getenv('open_weather_api')
@@ -45,7 +45,8 @@ def get_current_date_time():
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     current_date = now.strftime("%Y-%m-%d")
-    return f"The current date is {current_date} and the time is {current_time}"
+    current_day = now.strftime("%A")
+    return f"The current date is {current_date}, it is a {current_day} and the time is {current_time}"
 
 
 def remind_drinking_water():
