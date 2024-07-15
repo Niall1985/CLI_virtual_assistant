@@ -70,7 +70,8 @@ def recognize_speech(prompt="Listening..."):
         r.adjust_for_ambient_noise(source)
         audio = r.listen(source)
     try:
-        return r.recognize_google(audio).lower()
+        recognized_text = r.recognize_google(audio).lower()
+        return recognized_text
     except sr.UnknownValueError:
         print("Google Speech Recognition could not understand audio")
     except sr.RequestError as e:
@@ -78,6 +79,7 @@ def recognize_speech(prompt="Listening..."):
     except Exception as e:
         print(f"An error occurred: {e}")
     return None
+
 
 def extract_city(command):
     doc = nlp(command)
@@ -115,16 +117,17 @@ def set_reminder_function(command):
     if reminder_message is None:
         return "I couldn't understand the reminder message. Please try again."
     
-    lucy.say("In how many seconds should I remind you?")
+    lucy.say("In how many minutes should I remind you?")
     lucy.runAndWait()
-    interval = recognize_speech("Listening for time interval...")
-    if interval is None:
+    interval_text = recognize_speech("Listening for time interval...")
+    if interval_text is None:
         return "I couldn't understand the time interval. Please try again."
 
     try:
-        interval = int(interval)
-        set_reminder(interval, reminder_message)
-        return f"Reminder set for {interval} seconds."
+        # Attempt to extract minutes from the recognized text
+        interval = int(next(filter(str.isdigit, interval_text), 0))
+        set_reminder(interval*60, reminder_message)
+        return f"Reminder set for {interval} minutes."
     except ValueError:
         return "I couldn't understand the time interval. Please try again."
 
