@@ -90,10 +90,6 @@ Lucy can respond to specific phrases with pre-defined responses:
 
 To exit the program, simply say "exit".
 
-## Contributing
-
-If you would like to contribute to Lucy, feel free to fork the repository and submit pull requests. All contributions are welcome!
-
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for more details.
