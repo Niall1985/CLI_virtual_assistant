@@ -18,11 +18,5 @@
 #     # Print recognized entities for debugging
 #     for ent in doc.ents:
 #         print(f"Entity: {ent.text}, Label: {ent.label_}")
-#     # Extract the first GPE entity
-#     for ent in doc.ents:
-#         if ent.label_ == "GPE":
-#             return ent.text
-#     return None
-
-# # Test the function
-# print(extract_city('I love Mumbai'))
+# # # Test the function
+# print(extract_city('Play your song'))

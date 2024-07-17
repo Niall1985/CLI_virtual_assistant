@@ -101,10 +101,10 @@ def recognize_speech(prompt="Listening..."):
     return None
 
 def health_tips_function(command):
-    return random.choice(health_tips)
+    return f"Here are some fitness tips, {health_tips}"
 
 def fitness_tips_function(command):
-    return random.choice(fitness_tips)
+    return f"Here are some fitness tips, {fitness_tips}"
 
 def extract_city(command):
     doc = nlp(command)
@@ -166,16 +166,16 @@ def set_reminder_function(command):
 def play_yt_content_function(command):
     yt_content = command.replace("play video", "").strip()
     kit.playonyt(yt_content)
-    return f"playing {yt_content} on youtube"
+    return f"Certainly"
 
 def custom_responses_function(command):
     if "thank you" in command:
         return f"Your welcome"
-    elif "how are you" in command:
+    elif "how are you" or "how are you doing" in command:
         return f"i am doing well, thanks for asking, what about you?"
     elif "i am doing fine" in command or "i am fine" in command or "i'm good" in command:
         return f"That's good to hear"
-    elif "i am talking to someone else" in command:
+    elif "i was talking to someone else" in command:
         return "i'm sorry for interrupting your conversation, please continue"
 def get_current_date_time_function(command):
     return get_current_date_time()
@@ -217,9 +217,10 @@ def get_weather(city):
         main = data['main']
         weather = data['weather'][0]
         temperature = main['temp']
-        temp_in_celcuis = temperature-273.15
+        temp_in_celcius = temperature-273.15
+        final_temp_in_celcius = round(temp_in_celcius, 2)
         description = weather['description']
-        return f"The weather in {city} is {description} with a temperature of {temp_in_celcuis}°C."
+        return f"The weather in {city} is {description} with a temperature of {final_temp_in_celcius}°C."
     else:
         return "City not found."
 
