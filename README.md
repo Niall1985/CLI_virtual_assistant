@@ -1,6 +1,6 @@
 # Lucy: Your Personal Virtual Assistant
 
-Lucy is a Python-based voice assistant designed to help you with various tasks using speech recognition, text-to-speech, and natural language processing. This assistant can perform a wide range of functions, including setting reminders, performing web searches, opening and closing applications, providing health and fitness tips, and more.
+Lucy is a Python-based virtual assistant designed to help you with various tasks using speech recognition, text-to-speech, and natural language processing. This assistant can perform a wide range of functions, including setting reminders, performing web searches, opening and closing applications, providing health and fitness tips, and more.
 
 ## Features
 
