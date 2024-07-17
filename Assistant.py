@@ -13,6 +13,8 @@ from AppOpener import open, close
 from plyer import notification  
 import requests
 import pywhatkit as kit
+import random
+
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
 weather_api = os.getenv('open_weather_api')
@@ -23,6 +25,24 @@ model = genai.GenerativeModel(model_name="gemini-pro")
 
 # English language model for spaCy
 nlp = spacy.load("en_core_web_sm")
+
+health_tips = [
+    "Drink at least 8 glasses of water to stay hydrated.",
+    "Eat a balanced diet rich in fruits, vegetables, and whole grains.",
+    "Get at least 7-8 hours of sleep each night.",
+    "Practice deep breathing exercises to reduce stress.",
+    "Take breaks and stretch regularly if you sit for long periods.",
+    "Incorporate more physical activity into your daily routine."
+]
+
+fitness_tips = [
+    "Aim for at least 30 minutes of moderate exercise, such as brisk walking, every day.",
+    "Incorporate strength training exercises into your workout routine.",
+    "Warm up before exercising and cool down afterward.",
+    "Stay consistent with your workouts to see long-term benefits.",
+    "Listen to your body and avoid overexertion.",
+    "Try different types of exercise to keep your routine interesting."
+]
 
 def speech_engine_settings():
     lucy = pyttsx3.init()
@@ -80,6 +100,11 @@ def recognize_speech(prompt="Listening..."):
         print(f"An error occurred: {e}")
     return None
 
+def health_tips_function(command):
+    return random.choice(health_tips)
+
+def fitness_tips_function(command):
+    return random.choice(fitness_tips)
 
 def extract_city(command):
     doc = nlp(command)
@@ -106,6 +131,8 @@ def execute_command(command):
         "how are you": custom_responses_function,
         "i am doing fine": custom_responses_function,
         "i am talking to someone else": custom_responses_function,
+        "health tips:": health_tips_function,
+        "fitness tips": fitness_tips_function,
         "exit": exit_function
     }
     
