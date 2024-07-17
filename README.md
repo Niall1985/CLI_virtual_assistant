@@ -53,7 +53,7 @@ Lucy is a Python-based voice assistant designed to help you with various tasks u
 To start the assistant, run the script:
 
 ```bash
-python lucy.py
+python Lucy_Assistant.py
 ```
 
 ## Usage
