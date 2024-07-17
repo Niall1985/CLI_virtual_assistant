@@ -12,7 +12,7 @@ import time
 from AppOpener import open, close
 from plyer import notification  
 import requests
-#import pywhatkit
+import pywhatkit as kit
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
 weather_api = os.getenv('open_weather_api')
@@ -101,6 +101,11 @@ def execute_command(command):
         "open a file": open_file_function,
         "close a file": close_file_function,
         "delete a file": delete_file_function,
+        "youtube": play_yt_content_function,
+        "thank you": custom_responses_function,
+        "how are you": custom_responses_function,
+        "i am doing fine": custom_responses_function,
+        "i am talking to someone else": custom_responses_function,
         "exit": exit_function
     }
     
@@ -131,8 +136,20 @@ def set_reminder_function(command):
     except ValueError:
         return "I couldn't understand the time interval. Please try again."
 
+def play_yt_content_function(command):
+    yt_content = command.replace("play video", "").strip()
+    kit.playonyt(yt_content)
+    return f"playing {yt_content} on youtube"
 
-
+def custom_responses_function(command):
+    if "thank you" in command:
+        return f"Your welcome"
+    elif "how are you" in command:
+        return f"i am doing well, thanks for asking, what about you?"
+    elif "i am doing fine" in command or "i am fine" in command or "i'm good" in command:
+        return f"That's good to hear"
+    elif "i am talking to someone else" in command:
+        return "i'm sorry for interrupting your conversation, please continue"
 def get_current_date_time_function(command):
     return get_current_date_time()
 
@@ -261,6 +278,8 @@ def main():
                                 lucy.say("Exiting the program. Goodbye Niall.")
                                 lucy.runAndWait()
                                 return
+                            elif result == "do not exit" or result == "don't exit":
+                                continue
                             else:
                                 lucy.say(result)
                                 lucy.runAndWait()
