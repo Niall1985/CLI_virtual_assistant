@@ -133,6 +133,7 @@ def execute_command(command):
         "i am talking to someone else": custom_responses_function,
         "health tips:": health_tips_function,
         "fitness tips": fitness_tips_function,
+        "play My Likes PlayList on youtube music": play_yt_music_function,
         "exit": exit_function
     }
     
@@ -167,6 +168,10 @@ def play_yt_content_function(command):
     yt_content = command.replace("play video", "").strip()
     kit.playonyt(yt_content)
     return f"Certainly"
+
+def play_yt_music_function(command):
+    yt_music = "https://music.youtube.com/watch?v=Bu0LKfB3CR8&list=LM"
+    webbrowser.open(yt_music)
 
 def custom_responses_function(command):
     if "thank you" in command:

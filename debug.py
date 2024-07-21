@@ -19,4 +19,6 @@
 #     for ent in doc.ents:
 #         print(f"Entity: {ent.text}, Label: {ent.label_}")
 # # # Test the function
-# print(extract_city('Play your song'))
+# print(extract_city('Play Superstar by Jamelia on youtube music'))
+
+n = int(input("Enter number:"))
