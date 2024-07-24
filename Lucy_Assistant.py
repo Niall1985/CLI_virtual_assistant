@@ -13,7 +13,6 @@ from AppOpener import open, close
 from plyer import notification  
 import requests
 import pywhatkit as kit
-import random
 
 load_dotenv()
 api_key = os.getenv('gemini_api_key')
