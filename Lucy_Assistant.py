@@ -301,7 +301,7 @@ def main():
                     lucy.runAndWait()
                     
                     while True:
-                        lucy.say("Please tell me what you want me to do. To exit the program say 'exit'.")
+                        lucy.say("Please tell me what you want me to do. To exit the program just say 'exit'.")
                         lucy.runAndWait()
                         command = recognize_speech("Listening for command...")
                         if command:
