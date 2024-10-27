@@ -104,5 +104,3 @@ This project is licensed under the GNU General Public License v3.0. See the `LIC
 - [plyer](https://plyer.readthedocs.io/en/latest/)
 - [requests](https://docs.python-requests.org/en/latest/)
 - [pywhatkit](https://pypi.org/project/pywhatkit/)
-
-Feel free to reach out if you have any questions or need further assistance. Enjoy using Lucy, your personal virtual assistant!
